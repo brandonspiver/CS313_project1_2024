@@ -105,14 +105,13 @@ class ClientManager implements Runnable {
 	@Override
 	public void run() {
 		try {
-			// System.out.println("We are getting here");
 			String msg;
-			while (clientSocket.isConnected()) {
+			while (!clientSocket.isClosed()) {
 				msg = bufRead.readLine();
 
-				// bufWrite.write("You: " + msg);
-				// bufWrite.newLine();
-				// bufWrite.flush();
+				bufWrite.write("You: " + msg);
+				bufWrite.newLine();
+				bufWrite.flush();
 				for (ClientManager client_ : clients) {
 					if (!client_.username.equals(username)) {
 						client_.bufWrite.write(username + ": " + msg);
@@ -124,8 +123,8 @@ class ClientManager implements Runnable {
 			}
 		} catch (Exception e) {
 			closeAllStreamsBroadcast();
-			closeAllStreams();
 		}
+
 	}
 
 	public void closeAllStreamsBroadcast() {
@@ -144,6 +143,8 @@ class ClientManager implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		closeAllStreams();
 
 	}
 

@@ -41,26 +41,28 @@ public class Client {
 			this.userName = userName;
 
 		} catch (IOException e) {
-			closeAllSreams();
+			closeAllSreams(bufRead, bufWrite, socket);
 		}
 
 	}
 
 	public void sender() {
+		Scanner inputText;
 		try {
 			bufWrite.write(userName);
 			bufWrite.newLine();
 			bufWrite.flush();
 
-			Scanner inputText = new Scanner(System.in);
+			inputText = new Scanner(System.in);
 			while (socket.isConnected()) {
 				String msg = inputText.nextLine();
 				bufWrite.write(msg);
 				bufWrite.newLine();
 				bufWrite.flush();
 			}
-		} catch (IOException e) {
-			closeAllSreams();
+		} catch (Exception e) {
+
+			closeAllSreams(bufRead, bufWrite, socket);
 		}
 	}
 
@@ -78,7 +80,7 @@ public class Client {
 						msg = bufRead.readLine();
 						if (msg.equals("##USERNAMETAKEN")) {
 							System.out.println("User name taken!\nTry again");
-							closeAllSreams();
+							closeAllSreams(bufRead, bufWrite, socket);
 						}
 						if (msg.length() > 14) {
 							if ((msg.substring(0, 14)).equals("##ClientJoin: ")) {
@@ -96,13 +98,13 @@ public class Client {
 						}
 					}
 				} catch (Exception e) {
-					closeAllSreams();
+					closeAllSreams(bufRead, bufWrite, socket);
 				}
 			}
 		}).start();
 	}
 
-	public void closeAllSreams() {
+	public void closeAllSreams(BufferedReader bufRead, BufferedWriter bWriter, Socket socket) {
 		System.out.println("Server disconnected");
 		try {
 			if (bufRead != null)
@@ -113,7 +115,7 @@ public class Client {
 				socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		};
 		System.exit(0);
 	}
 }
